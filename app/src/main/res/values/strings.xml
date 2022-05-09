@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Oze</string>
+    <string name="username">Username: </string>
+    <string name="score">Score: </string>
+    <string name="bookmark">Bookmark</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="remove">Remove</string>
+    <string name="clear_all">Clear all</string>
+</resources>

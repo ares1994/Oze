@@ -56,6 +56,7 @@ object AppModule {
         .build()
 
 
+    @Singleton
     @Provides
     fun getDatabase(application: Application): UsersDatabase = Room.databaseBuilder(
         application.applicationContext,

@@ -1,5 +1,6 @@
 package com.arepade.oze
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -7,8 +8,10 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.ExperimentalPagingApi
+import androidx.recyclerview.widget.DiffUtil
 import com.arepade.oze.adapters.UsersAdapter
 import com.arepade.oze.dataModels.Bookmarked
 import com.arepade.oze.dataModels.ItemsItem
@@ -17,7 +20,10 @@ import com.arepade.oze.database.UsersDao
 import com.arepade.oze.databinding.ActivityMainBinding
 import com.arepade.oze.network.Github
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -41,6 +47,8 @@ class MainActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener {
     private val nAdapter = UsersAdapter(ItemDiffUtil, this)
 
 
+    @ExperimentalCoroutinesApi
+    @SuppressLint("CheckResult")
     @ExperimentalPagingApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,23 +64,11 @@ class MainActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener {
         binding.recyclerView.adapter = nAdapter
 
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.fetchPosts().collectLatest {
+        viewModel.fetchPosts().observeOn(AndroidSchedulers.mainThread()).subscribe {
+            lifecycleScope.launch {
                 nAdapter.submitData(it)
             }
         }
-
-
-
-//        binding.print.setOnClickListener {
-//            lifecycleScope.launch {
-//                withContext(Dispatchers.IO) {
-//                    Log.d("Ares", bookmarkedDao.getBookmarked().value.toString())
-//                }
-//            }
-//        }
-
-
     }
 
     override fun onDoAction(value: ItemsItem?) {

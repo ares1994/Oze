@@ -70,7 +70,7 @@ dependencies {
     //Room
     implementation "androidx.room:room-runtime:2.3.0"
     kapt "androidx.room:room-compiler:2.3.0"
-
+    implementation "androidx.room:room-rxjava2:2.3.0"
     //Paging
     implementation "androidx.paging:paging-runtime-ktx:3.0.0"
 
@@ -79,6 +79,11 @@ dependencies {
 
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+
+    //RxJava/RxAndroid
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
 }
 
 kapt {

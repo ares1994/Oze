@@ -1,21 +1,23 @@
 package com.arepade.oze
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import androidx.paging.rxjava2.cachedIn
+import androidx.paging.rxjava2.observable
 import com.arepade.oze.dataModels.Bookmarked
 import com.arepade.oze.dataModels.ItemsItem
 import com.arepade.oze.database.BookmarkedDao
 import com.arepade.oze.database.UsersDao
 import com.arepade.oze.network.Github
-import kotlinx.coroutines.Dispatchers
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainViewModel @ViewModelInject constructor(
     private val usersDao: UsersDao,
@@ -23,41 +25,61 @@ class MainViewModel @ViewModelInject constructor(
     private val service: Github
 ) : ViewModel() {
 
+    private val disposable = CompositeDisposable()
 
     fun insert(data: List<ItemsItem?>?) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                usersDao.insert(*data!!.map { it!! }.toTypedArray())
-            }
-        }
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                usersDao.insert(*data!!.map { it!! }.toTypedArray())
+//            }
+//        }
+
+        disposable.add(
+            usersDao.insert(*data!!.map { it!! }.toTypedArray()).subscribeOn(Schedulers.io())
+                .subscribe()
+        )
     }
 
+
     fun insert(bookmarked: Bookmarked) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                bookmarkedDao.insert(bookmarked)
-            }
-        }
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                bookmarkedDao.insert(bookmarked)
+//            }
+//        }
+
+        disposable.add(
+            bookmarkedDao.insert(bookmarked).subscribeOn(Schedulers.io()).subscribe()
+        )
     }
 
     fun delete(bookmarked: Bookmarked) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                bookmarkedDao.delete(bookmarked)
-            }
-        }
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                bookmarkedDao.delete(bookmarked)
+//            }
+//        }
+        disposable.add(
+            bookmarkedDao.delete(bookmarked).subscribeOn(Schedulers.io()).subscribe()
+        )
     }
 
-    fun clearAllBookmarks(){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                bookmarkedDao.clear()
-            }
-        }
+    fun clearAllBookmarks() {
+//        viewModelScope.launch {
+//            withContext(Dispatchers.IO) {
+//                bookmarkedDao.clear()
+//            }
+//        }
+
+
+        Observable.create<Unit> {
+            it.onNext(bookmarkedDao.clear())
+        }.subscribeOn(Schedulers.io()).subscribe()
     }
 
+    @ExperimentalCoroutinesApi
     @ExperimentalPagingApi
-    fun fetchPosts(): Flow<PagingData<ItemsItem>> {
+    fun fetchPosts(): Observable<PagingData<ItemsItem>> {
         return Pager(
             config = PagingConfig(30),
             remoteMediator = GithubRemoteMediator(service, this)
@@ -65,7 +87,7 @@ class MainViewModel @ViewModelInject constructor(
 //            GithubRemotePagingSource(service, usersDao, this)
             usersDao.getAllUsers()
 
-        }.flow.cachedIn(viewModelScope)
+        }.observable.cache()
     }
 
 

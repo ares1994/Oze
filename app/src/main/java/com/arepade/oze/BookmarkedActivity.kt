@@ -1,5 +1,6 @@
 package com.arepade.oze
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,6 +17,7 @@ import com.arepade.oze.database.BookmarkedDao
 import com.arepade.oze.databinding.ActivityBookmarkedBinding
 import com.arepade.oze.databinding.ActivityDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
 
@@ -30,6 +32,7 @@ class BookmarkedActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener 
 
     private val mAdapter = BookmarkAdapter(BookmarkDiffUtil, this)
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -38,9 +41,10 @@ class BookmarkedActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener 
 
         binding.recyclerView.adapter = mAdapter
 
-        bookmarkedDao.getBookmarked().observe(this, Observer {
+        bookmarkedDao.getBookmarked().observeOn(AndroidSchedulers.mainThread()).subscribe {
             mAdapter.submitList(it)
-        })
+        }
+
 
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -54,8 +58,8 @@ class BookmarkedActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener 
                 finish()
             }
             R.id.clearAll -> {
-             viewModel.clearAllBookmarks()
-                createSnackBar(binding.root,"Bookmarks Cleared")
+                viewModel.clearAllBookmarks()
+                createSnackBar(binding.root, "Bookmarks Cleared")
             }
 
 

@@ -5,6 +5,10 @@ import androidx.paging.PagingSource
 import androidx.room.*
 import com.arepade.oze.dataModels.Bookmarked
 import com.arepade.oze.dataModels.ItemsItem
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.Maybe
+import io.reactivex.Observable
 
 @Dao
 interface UsersDao {
@@ -13,20 +17,20 @@ interface UsersDao {
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg users: ItemsItem)
+    fun insert(vararg users: ItemsItem):Completable
 }
 
 @Dao
 interface BookmarkedDao {
     @Query("select * from bookmarked")
-    fun getBookmarked(): LiveData<List<Bookmarked>>
+    fun getBookmarked(): Observable<List<Bookmarked>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vararg bookmark: Bookmarked)
+    fun insert(vararg bookmark: Bookmarked): Completable
 
     @Delete
-    fun delete(bookmark: Bookmarked)
+    fun delete(bookmark: Bookmarked): Completable
 
     @Query("DELETE FROM bookmarked")
     fun clear()

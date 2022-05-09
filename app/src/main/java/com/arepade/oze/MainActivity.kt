@@ -69,6 +69,10 @@ class MainActivity : AppCompatActivity(), UsersAdapter.OnBookmarkListener {
                 nAdapter.submitData(it)
             }
         }
+
+
+
+
     }
 
     override fun onDoAction(value: ItemsItem?) {

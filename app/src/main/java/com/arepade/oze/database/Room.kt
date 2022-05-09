@@ -1,13 +1,11 @@
 package com.arepade.oze.database
 
-import androidx.lifecycle.LiveData
+
 import androidx.paging.PagingSource
 import androidx.room.*
 import com.arepade.oze.dataModels.Bookmarked
 import com.arepade.oze.dataModels.ItemsItem
 import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Maybe
 import io.reactivex.Observable
 
 @Dao

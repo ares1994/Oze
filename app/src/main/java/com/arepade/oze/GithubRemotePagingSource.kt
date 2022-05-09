@@ -10,9 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 class GithubRemotePagingSource constructor(
-    private val service: Github,
-    private val userDao: UsersDao,
-    private val viewModel: MainViewModel
+    private val service: Github
 ) :
     PagingSource<Int, ItemsItem>() {
     override fun getRefreshKey(state: PagingState<Int, ItemsItem>): Int? {
@@ -21,50 +19,28 @@ class GithubRemotePagingSource constructor(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ItemsItem> {
 
-        val l = mutableListOf<ItemsItem>()
-
-        var p = 1
-
-
-
-
-//        if (params.key == null) {
-//            val list = viewModel.data.value
-//
-//            if (!list.isNullOrEmpty()) {
-//                p = list.size / 30
-//                l.addAll(list)
-//            }
-//
-//            Log.d("Ares", "In PagingSource ${list.toString()}")
-//        }
-
 
         return try {
-            val page = params.key ?: p
+            val page = params.key ?: 1
             val response = service.getUsersAsync(page = page.toString())
 
-            try {
-                viewModel.insert(response.items!!.map { it.apply { it?.page = page } })
-            }catch (t:Throwable){
-                t.message?.let { Log.d("Ares", it) }
-            }
 
-
-            l.addAll(response.items!!.map { it!! })
 
 
             LoadResult.Page(
-                data = l,
+                data = response.items!!.map { it!! },
                 prevKey = if (page == 1) null else page - 1,
                 nextKey = page + 1
             )
         } catch (t: Throwable) {
-            Log.d("Ares", "In PagingSource-> ${t.message}")
+            Log.d(TAG, "In PagingSource-> ${t.message}")
             LoadResult.Error(t)
         }
 
     }
 
 
+    companion object {
+        const val TAG = "GithubRemotePaging"
+    }
 }

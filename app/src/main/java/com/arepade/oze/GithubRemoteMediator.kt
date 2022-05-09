@@ -32,32 +32,16 @@ class GithubRemoteMediator(private val service: Github, private val viewModel: M
             }
         }
 
-        var loadKey = when (loadType) {
+        val loadKey = when (loadType) {
             LoadType.REFRESH -> 0
-            // In this example, we never need to prepend, since REFRESH will always load the
-            // first page in the list. Immediately return, reporting end of pagination.
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
-            // Query remoteKeyDao for the next RemoteKey.
             LoadType.APPEND -> {
-                count = count!! +1
+                count = count!! + 1
 
                 count
             }
         }
 
-
-
-
-
-
-
-//        Log.d("Ares", "state size is ${state.pages[0].data.size}")
-//        Log.d("Ares", "state div value is ${(state.pages[0].data.size / 30) + 1}")
-//        Log.d("Ares", "state is ${state.lastItemOrNull() == null}")
-//
-//        Log.d("Ares", "state is ${state.lastItemOrNull() == null}")
-//        Log.d("Ares", "In Mediator")
-//        Log.d("Ares", loadKey.toString())
 
         try {
             val response = service.getUsersAsync(page = loadKey.toString())
@@ -66,13 +50,10 @@ class GithubRemoteMediator(private val service: Github, private val viewModel: M
             val users = response.items
 
 
-            try {
-                viewModel.insert(users!!.map { it.apply { it?.page = count } })
-            } catch (t: Throwable) {
-                t.message?.let { Log.d("Ares", it) }
-            }
 
-//            val endOfPaginationReached = users!!.isEmpty()
+            viewModel.insert(users!!.map { it.apply { it?.page = count } })
+
+
 
             return MediatorResult.Success(
                 endOfPaginationReached = false
@@ -83,6 +64,10 @@ class GithubRemoteMediator(private val service: Github, private val viewModel: M
                 t
             )
         }
+    }
+
+    companion object {
+        const val TAG = "GithubRemoteMediator"
     }
 
 }

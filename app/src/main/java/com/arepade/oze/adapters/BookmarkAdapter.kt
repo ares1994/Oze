@@ -22,15 +22,15 @@ class BookmarkAdapter(
     private val onBookmarkListener: UsersAdapter.OnBookmarkListener
 ) :
     ListAdapter<Bookmarked, BookmarkAdapter.BookmarkViewHolder>(diffCallback) {
-    override fun onBindViewHolder(holder: BookmarkAdapter.BookmarkViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BookmarkViewHolder, position: Int) {
         holder.bind(getItem(position), onBookmarkListener)
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): BookmarkAdapter.BookmarkViewHolder {
-        return BookmarkAdapter.BookmarkViewHolder(
+    ):BookmarkViewHolder {
+        return BookmarkViewHolder(
             ItemListDataBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,

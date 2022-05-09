@@ -28,11 +28,6 @@ class MainViewModel @ViewModelInject constructor(
     private val disposable = CompositeDisposable()
 
     fun insert(data: List<ItemsItem?>?) {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                usersDao.insert(*data!!.map { it!! }.toTypedArray())
-//            }
-//        }
 
         disposable.add(
             usersDao.insert(*data!!.map { it!! }.toTypedArray()).subscribeOn(Schedulers.io())
@@ -42,36 +37,18 @@ class MainViewModel @ViewModelInject constructor(
 
 
     fun insert(bookmarked: Bookmarked) {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                bookmarkedDao.insert(bookmarked)
-//            }
-//        }
-
         disposable.add(
             bookmarkedDao.insert(bookmarked).subscribeOn(Schedulers.io()).subscribe()
         )
     }
 
     fun delete(bookmarked: Bookmarked) {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                bookmarkedDao.delete(bookmarked)
-//            }
-//        }
         disposable.add(
             bookmarkedDao.delete(bookmarked).subscribeOn(Schedulers.io()).subscribe()
         )
     }
 
     fun clearAllBookmarks() {
-//        viewModelScope.launch {
-//            withContext(Dispatchers.IO) {
-//                bookmarkedDao.clear()
-//            }
-//        }
-
-
         Observable.create<Unit> {
             it.onNext(bookmarkedDao.clear())
         }.subscribeOn(Schedulers.io()).subscribe()
@@ -91,4 +68,8 @@ class MainViewModel @ViewModelInject constructor(
     }
 
 
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()
+    }
 }

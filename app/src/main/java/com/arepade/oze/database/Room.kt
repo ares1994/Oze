@@ -31,7 +31,7 @@ interface BookmarkedDao {
     fun delete(bookmark: Bookmarked): Completable
 
     @Query("DELETE FROM bookmarked")
-    fun clear()
+    fun clear() : Completable
 }
 
 @Database(entities = [ItemsItem::class, Bookmarked::class], version = 1, exportSchema = false)

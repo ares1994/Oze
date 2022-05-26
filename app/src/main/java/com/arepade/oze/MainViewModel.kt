@@ -49,9 +49,9 @@ class MainViewModel @ViewModelInject constructor(
     }
 
     fun clearAllBookmarks() {
-        Observable.create<Unit> {
-            it.onNext(bookmarkedDao.clear())
-        }.subscribeOn(Schedulers.io()).subscribe()
+        disposable.add(
+            bookmarkedDao.clear().subscribeOn(Schedulers.io()).subscribe()
+        )
     }
 
     @ExperimentalCoroutinesApi
